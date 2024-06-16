@@ -1,6 +1,8 @@
 # 🌐 Resipe
 
-Welcome to the **Resipe** project! A recipe sharing webapp where users' karma and location affect their permissions to perform operations such as view recipe or upvote recipe, it fetches the data dynamically from a MySQL server and uses opal for authorisation implementing custom opal data fetcher for mysql.
+Welcome to the **Resipe** project! 
+
+A recipe sharing webapp where users' karma and location affect their permissions to perform operations such as view recipe or upvote recipe, it fetches the data dynamically from a MySQL server and uses opal for authorisation implementing custom opal data fetcher for mysql.
 
 https://github.com/bhimeshagrawal/Resipe/assets/65838772/57e79d7a-351f-4c61-abb4-e672b0f6b426
 
@@ -100,12 +102,16 @@ You can run the client at `http://localhost:5173`
 - A chef can upvote any recipe, also upvoting a recipe increases karma by 10
 
 You can explore your mysql database through adminer using `http://localhost:8083`
+
 You can check OPA cache data by making a GET request to url `http://localhost:8181/v1/data`
+
 You can check your current policies by making a GET request to url `http://localhost:7002/policy`
+
 You can publish a data update event by making a POST request to url `http://localhost:7002/data/config` with sending entries object as body
 
-## Project Structure
 
+## Project Structure
+```
 Resipe
 ├── client/
 ├── server/
@@ -125,6 +131,7 @@ Resipe
 ├── setup.py
 ├── start.sh
 └── wait-for.sh
+```
 
 ## Contributing
 Contributions are welcome! If you have any suggestions, bug reports, or improvements, please create a pull request or open an issue.
