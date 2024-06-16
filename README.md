@@ -125,7 +125,7 @@ Resipe
 ├── LICENSE
 ├── Makefile
 ├── MANIFEST.in
-├── policy.rego
+├── rbac.rego
 ├── pyproject.toml
 ├── README.md
 ├── setup.py
