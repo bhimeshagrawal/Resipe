@@ -1,0 +1,43 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id           Int      @id @default(autoincrement())
+    email        String   @unique
+    name         String
+    karma        Int      @default(0)
+    location     String
+    createdAt    DateTime @default(now())
+    user_recipes Recipe[]
+    upvotes      Upvote[]
+
+    @@map("users")
+}
+
+model Recipe {
+    id          Int      @id @default(autoincrement())
+    title       String
+    description String
+    ingredients String
+    location    String
+    userId      Int
+    user        User     @relation(fields: [userId], references: [id])
+    createdAt   DateTime @default(now())
+    upvotes     Upvote[]
+
+    @@map("recipes")
+}
+
+model Upvote {
+    id       Int    @id @default(autoincrement())
+    recipe   Recipe @relation(fields: [recipeId], references: [id])
+    recipeId Int
+    voterId  Int
+    voter    User   @relation(fields: [voterId], references: [id])
+}

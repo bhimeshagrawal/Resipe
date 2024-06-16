@@ -1,0 +1,66 @@
+version: "3.8"
+services:
+  broadcast_channel:
+    image: postgres:alpine
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8083:8080
+
+  example_db:
+    image: mysql:8.0
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=test
+      - MYSQL_USER=test
+      - MYSQL_PASSWORD=mysql
+      - MYSQL_ROOT_PASSWORD=mysql
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  opal_server:
+    image: permitio/opal-server:latest
+    environment:
+      - OPAL_BROADCAST_URI=postgres://postgres:postgres@broadcast_channel:5432/postgres
+      - UVICORN_NUM_WORKERS=4
+      - OPAL_POLICY_REPO_URL=https://github.com/bhimeshagrawal/opal-example-policy-repo
+      - OPAL_POLICY_REPO_POLLING_INTERVAL=30
+      - OPAL_DATA_CONFIG_SOURCES={"config":{"entries":[{"url":"mysql://root:mysql@example_db:3306/test?password=mysql","config":{"fetcher":"MySQLFetchProvider","query":"SELECT * FROM users","connection_params":{"host":"example_db","user":"root","port":3306,"db":"test","password":"mysql"}},"topics":["mysql"],"dst_path":"users"},{"url":"mysql://root:mysql@example_db:3306/test?password=mysql","config":{"fetcher":"MySQLFetchProvider","query":"SELECT * FROM recipes","connection_params":{"host":"example_db","user":"root","port":3306,"db":"test","password":"mysql"}},"topics":["mysql"],"dst_path":"recipes"}]}}
+    ports:
+      - "7002:7002"
+    depends_on:
+      - broadcast_channel
+
+  opal_client:
+    build:
+      context: .
+    environment:
+      - OPAL_SERVER_URL=http://opal_server:7002
+      - OPAL_LOG_FORMAT_INCLUDE_PID=true
+      - OPAL_FETCH_PROVIDER_MODULES=opal_common.fetcher.providers,opal_fetcher_mysql.provider
+      - OPAL_INLINE_OPA_LOG_FORMAT=http
+      - OPA_LOG_LEVEL=debug
+      - OPAL_SHOULD_REPORT_ON_DATA_UPDATES=True
+      - OPAL_DATA_TOPICS=mysql
+    ports:
+      - "7766:7000"
+      - "8181:8181"
+    depends_on:
+      - opal_server
+      - example_db
+
+    command: sh -c "./wait-for.sh opal_server:7002 example_db:3306 --timeout=20 -- ./start.sh"
