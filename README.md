@@ -62,6 +62,7 @@ To install and run this project, we have three services to start, follow these s
    ```bash
    docker compose up
    ```
+   In this step you might run into a permission issue which looks like `Permission Denied` as we are copying our fetcher files in docker container, to fix that use command `chmod -R 777 ./` in root directory.
    
 3. **Start the server**
    Before starting server make sure that OPAL service is up and then create a `.env` file in `server` directory and paste following code into it.
@@ -78,12 +79,12 @@ To install and run this project, we have three services to start, follow these s
    ```
    Now our server will start at `http://localhost:3000`
 
-5. **Creating Auth0 Credentials**
+4. **Creating Auth0 Credentials**
    - Go to Auth0 and create credentials for your single page app (react)
    - Disable email+password login and only enable google oauth login
    - Replace the `domain` and `clientId` from auth0 in `App.jsx` file present in client
    
-7. **Start the client**
+5. **Start the client**
    Before starting client make sure that server is up and then run following commands in `client` directory to start the client:
    ```bash
    npm install
